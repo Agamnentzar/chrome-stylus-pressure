@@ -1,0 +1,10 @@
+{
+  "name": "com.agamnentzar.stylus",
+  "description": "Stylus pressure Plugin",
+  "path": "StylusPressurePlugin.exe",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://ecelnbeiglepohnlccefodfpmedepoll/",
+    "chrome-extension://kbnojgniokejpkicbablbbpagagiphnh/"
+  ]
+}

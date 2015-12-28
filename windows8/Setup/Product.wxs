@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="Stylus Pressure Plugin" Language="1033" Version="2.0.0.0" Manufacturer="Agamnentzar" UpgradeCode="bd3d1113-f11c-4bab-9ab8-5491562c2ab4">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+		<Condition Message="You need to be an administrator to install this product.">Privileged</Condition>
+		<Condition Message="This application is only supported on Windows 8, or higher.">
+			<![CDATA[VersionNT < 620]]>
+		</Condition>
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<Media Id="1" Cabinet="Main.cab" EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="Stylue Pressure Plugin" Level="1">
+			<ComponentRef Id="ExeFileComponent" />
+			<ComponentRef Id="DllFileComponent" />
+			<ComponentRef Id="JsonFileComponent" />
+			<ComponentRef Id="RegistryEntries" />
+		</Feature>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLLOCATION" Name="StylusPressurePlugin">
+					<Component Id="ExeFileComponent" Guid="*">
+						<File Id="ExeFile" Name="StylusPressurePlugin.exe" Source="..\Release\StylusPressurePlugin.exe" />
+					</Component>
+					<Component Id="DllFileComponent" Guid="*">
+						<File Id="DllFile" Name="HookDll.dll" Source="..\Release\HookDll.dll" />
+					</Component>
+					<Component Id="JsonFileComponent" Guid="*">
+						<File Id="JsonFile" Name="native.json" Source="..\Plugin\native.json" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<DirectoryRef Id="TARGETDIR">
+			<Component Id="RegistryEntries" Guid="*">
+				<RegistryKey Root="HKLM" Key="SOFTWARE\Google\Chrome\NativeMessagingHosts\com.agamnentzar.stylus" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Value="[INSTALLLOCATION]native.json" />
+				</RegistryKey>
+			</Component>
+		</DirectoryRef>
+
+		<Icon Id="MainIcon" SourceFile="icon.ico" />
+		<Property Id="ARPPRODUCTICON" Value="MainIcon" />
+
+	</Product>
+</Wix>
