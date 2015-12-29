@@ -91,7 +91,9 @@ interface Pen {
 
 #### Linux
 
-*TODO*
+* XInput libraries: `lix11-dev` and `xorg-dev`
+* make
+* g++
 
 #### OSX
 
