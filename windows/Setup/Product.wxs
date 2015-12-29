@@ -6,7 +6,7 @@
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<Media Id="1" Cabinet="Main.cab" EmbedCab="yes" />
 
-		<Feature Id="ProductFeature" Title="Stylue Pressure Plugin" Level="1">
+		<Feature Id="ProductFeature" Title="Stylus Pressure Plugin" Level="1">
 			<ComponentRef Id="ExeFileComponent" />
 			<ComponentRef Id="JsonFileComponent" />
 			<ComponentRef Id="RegistryEntries" />
