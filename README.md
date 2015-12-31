@@ -91,9 +91,10 @@ interface Pen {
 
 #### Linux
 
-* XInput libraries: `lix11-dev` and `xorg-dev`
+* XInput libraries: `lix11-dev` and `xorg-dev` `sudo apt-get install lix11-dev xorg-dev`
 * make
 * g++
+* fakeroot: needed when generating .deb package `sudo apt-get install fakeroot`
 
 #### OSX
 

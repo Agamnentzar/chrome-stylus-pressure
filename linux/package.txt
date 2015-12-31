@@ -1,7 +1,8 @@
 Package: chrome-stylus-pressure
 Version: VERSION
-Section: base
+Section: web
 Priority: optional
 Architecture: i386
 Maintainer: Radosław Eichler <agamnentzar@gmail.com>
+Installed-Size: 30
 Description: Plugin providing pressure data for Google Chrome
