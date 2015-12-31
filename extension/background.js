@@ -16,7 +16,7 @@ var restart = function () {
 
 if (navigator.appVersion.indexOf("Win") !== -1) os = "Windows";
 if (navigator.appVersion.indexOf("Mac") !== -1) os = "Mac";
-if (navigator.appVersion.indexOf("X11") !== -1) os = "UNIX";
+if (navigator.appVersion.indexOf("X11") !== -1) os = "Linux"; // UNIX
 if (navigator.appVersion.indexOf("Linux") !== -1) os = "Linux";
 
 function send(msg) {
@@ -71,7 +71,7 @@ function connectNativePort() {
 			send({
 				error: 'install',
 				errorMessage: errorMessage,
-				installLink: 'http://ag.rushbase.net/StylusPressurePlugin.msi',
+				installLink: 'https://github.com/Agamnentzar/chrome-stylus-pressure/releases/download/1.0.1/StylusPressurePlugin.msi',
 				connected: connected
 			});
 			timeout = setTimeout(connectNativePort, 1000);
@@ -85,9 +85,7 @@ function connectNativePort() {
 	}
 }
 
-if (os !== "Windows") {
-	popupMessage = 'notsupported';
-} else {
+if (os === "Windows" || os === "Linux") {
 	chrome.runtime.onConnectExternal.addListener(function (port) {
 		chrome.pageAction.show(port.sender.tab.id);
 
@@ -113,4 +111,6 @@ if (os !== "Windows") {
 
 		port.postMessage({ connected: connected });
 	});
+} else {
+	popupMessage = 'notsupported';
 }
