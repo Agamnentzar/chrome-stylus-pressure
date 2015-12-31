@@ -1,4 +1,4 @@
-VERSION = 1.0
+VERSION = 1.0.0
 PACKAGE_VERSION = 1
 PACKAGE_NAME = chrome-stylus-pressure_$(VERSION)-$(PACKAGE_VERSION)
 
