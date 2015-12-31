@@ -13,13 +13,20 @@
 #define VALUATOR_TILTX    3
 #define VALUATOR_TILTY    4
 
+#define STR(x) #x
+#define XSTR(x) STR(x)
+
 #ifdef DEBUG
 #define debug printf
 #else
 #define debug(body, ...)
 #endif
 
-const char *version = "1.0.0";
+#ifndef VERSION
+#define VERSION 0.0
+#endif
+
+const char *version = XSTR(VERSION);
 char buffer[1024];
 
 int screen_width, screen_height;

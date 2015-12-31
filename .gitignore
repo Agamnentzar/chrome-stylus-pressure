@@ -1,6 +1,7 @@
 
 Debug
 Release
+build
 .vs
 *.sdf
 *.vcxproj.user
