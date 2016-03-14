@@ -256,8 +256,8 @@ void PrintDeviceEvents(Display *display, XDevice *stylus, XDevice *eraser)
 
 int main()
 {
-	snprintf(buffer, sizeof(buffer), "{\"version\":\"%s\"}", version);
-	SendData(buffer);
+    snprintf(buffer, sizeof(buffer), "{\"version\":\"%s\"}", version);
+    SendData(buffer);
     
     Display *display = XOpenDisplay(NULL);
 

@@ -22,7 +22,7 @@
 #define WM_FOCUS_TABLET (WM_APP + 0x0001)
 #define WM_BLUR_TABLET (WM_APP + 0x0002)
 
-const char* version = "1.0.1";
+const char* version = "1.0.2";
 
 struct TabletInfo
 {
@@ -191,7 +191,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	case WM_CREATE:
 		if (!OpenTabletContexts(hWnd))
 		{
-			SendError("no tablets found");
+			//SendError("no tablets found");
 			WacomTrace("No tablets found.");
 		}
 		break;
@@ -236,7 +236,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 
 		if (gnAttachedDevices == 0)
 		{
-			SendError("no tablets found");
+			//SendError("no tablets found");
 			WacomTrace("No tablets found.");
 		}
 	}

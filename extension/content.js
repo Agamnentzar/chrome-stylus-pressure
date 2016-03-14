@@ -19,7 +19,12 @@ function main(window, runtimeId) {
 		},
 		pen: function () {
 			return connected ? pen : null;
-		}
+		},
+		focus: function () {
+			if (port) {
+				port.postMessage('focus');
+			}
+		},
 	};
 	var port = chrome.runtime.connect(runtimeId);
 
@@ -65,13 +70,15 @@ function main(window, runtimeId) {
 	port.postMessage('focus'); // TODO: only if focused ?
 
 	window.addEventListener('focus', function () {
-		if (port)
+		if (port) {
 			port.postMessage('focus');
+		}
 	});
 
 	window.addEventListener('blur', function () {
-		if (port)
+		if (port) {
 			port.postMessage('blur');
+		}
 	});
 
 	window.Tablet = tablet;

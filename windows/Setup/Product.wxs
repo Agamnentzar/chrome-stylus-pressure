@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="Stylus Pressure Plugin" Language="1033" Version="1.0.1.0" Manufacturer="Agamnentzar" UpgradeCode="bd3d1113-f11c-4bab-9ab8-5491562c2ab4">
+	<Product Id="*" Name="Stylus Pressure Plugin" Language="1033" Version="1.0.2.0" Manufacturer="Agamnentzar" UpgradeCode="bd3d1113-f11c-4bab-9ab8-5491562c2ab4">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 		<Condition Message="You need to be an administrator to install this product.">Privileged</Condition>
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />

@@ -1,16 +1,16 @@
 # Chrome Stylus Pressure
 
-Extension for chrome providing stylus pressure data the the browser
+Extension for chrome providing stylus pressure data to the browser
 
 ## Supported systems
 
-* **Windows XP/Vista/7** - wintab compatible tablets
+* **Windows XP/Vista/7+** - wintab compatible tablets
 * **Windows 8+** - all tablets using pointer events
 
 ## Installation
 
 1. Install extension from [chrome web store](https://chrome.google.com/webstore/detail/stylus-pressure/ecelnbeiglepohnlccefodfpmedepoll)
-2. Go to my [drawing application](http://draw.rushbase.net/stylus-pressure)
+2. Go to my [drawing application](https://aggie.io/stylus-pressure)
 3. Click on the red brush icon in your address bar<br>![](resources/error.png)
 4. Install additional native application provided in the popup window
 5. Stylus pressure should work now in your browser
@@ -41,10 +41,10 @@ button to fix the issue.
 ```javascript
 var tablet = window.Tablet;
 var pen = tablet.pen;
+var drawArea = document.getElementById('draw-area');
 
-document.getElementById('draw-area').addEventListener('mousemove', function (e) {
-	var pressure = pen.pressure;
-	console.log('pressure', pressure);
+drawArea.addEventListener('mousemove', function (e) {
+	console.log('pressure', pen.pressure);
 });
 ```
 
@@ -54,7 +54,7 @@ after each mouse event if you need more precise measurements.
 
 ### Object definitions
 
-```javascript
+```typescript
 interface Tablet {
 	// callback function to call after receiving each pressure packet
 	gotPressure: (pressure: number) => void;
