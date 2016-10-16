@@ -1,10 +1,11 @@
-var nativePluginVersion = "1.0.0";
+var nativeInstallUrl = 'https://github.com/Agamnentzar/chrome-stylus-pressure/releases/download/1.0.1/StylusPressurePlugin.msi';
+var nativePluginVersion = '1.0.0';
 var nativePort = null;
 var popupMessage = 'ok';
 var popupError = null;
 var timeout = null;
 var ports = [];
-var os = "Unknown";
+var os = 'Unknown';
 var connected = false;
 var restart = function () {
 	if (nativePort) {
@@ -14,10 +15,10 @@ var restart = function () {
 	}
 };
 
-if (navigator.appVersion.indexOf("Win") !== -1) os = "Windows";
-if (navigator.appVersion.indexOf("Mac") !== -1) os = "Mac";
-if (navigator.appVersion.indexOf("X11") !== -1) os = "Linux"; // UNIX
-if (navigator.appVersion.indexOf("Linux") !== -1) os = "Linux";
+if (navigator.appVersion.indexOf('Win') !== -1) os = 'Windows';
+if (navigator.appVersion.indexOf('Mac') !== -1) os = 'Mac';
+if (navigator.appVersion.indexOf('X11') !== -1) os = 'Linux'; // UNIX
+if (navigator.appVersion.indexOf('Linux') !== -1) os = 'Linux';
 
 function send(msg) {
 	ports.forEach(function (port) {
@@ -71,7 +72,7 @@ function connectNativePort() {
 			send({
 				error: 'install',
 				errorMessage: errorMessage,
-				installLink: 'https://github.com/Agamnentzar/chrome-stylus-pressure/releases/download/1.0.1/StylusPressurePlugin.msi',
+				installLink: nativeInstallUrl,
 				connected: connected
 			});
 			timeout = setTimeout(connectNativePort, 1000);
@@ -85,7 +86,7 @@ function connectNativePort() {
 	}
 }
 
-if (os === "Windows" || os === "Linux") {
+if (os === 'Windows' || os === 'Linux') {
 	chrome.runtime.onConnectExternal.addListener(function (port) {
 		chrome.pageAction.show(port.sender.tab.id);
 
