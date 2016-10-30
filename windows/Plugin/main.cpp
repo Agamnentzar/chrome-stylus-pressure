@@ -22,7 +22,7 @@
 #define WM_FOCUS_TABLET (WM_APP + 0x0001)
 #define WM_BLUR_TABLET (WM_APP + 0x0002)
 
-const char* version = "1.0.2";
+const char* version = "1.0.3";
 
 struct TabletInfo
 {

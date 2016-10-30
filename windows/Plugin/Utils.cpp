@@ -1,6 +1,5 @@
 #include "Utils.h"
 
-//////////////////////////////////////////////////////////////////////////////
 HINSTANCE ghWintab = NULL;
 
 WTINFOA gpWTInfoA = NULL;
@@ -24,25 +23,16 @@ WTMGRCLOSE gpWTMgrClose = NULL;
 WTMGRDEFCONTEXT gpWTMgrDefContext = NULL;
 WTMGRDEFCONTEXTEX gpWTMgrDefContextEx = NULL;
 
-// TODO - add more wintab32 function pointers as needed
+// NOTE: add more wintab32 function pointers as needed
 
 #define GETPROCADDRESS(type, func) \
 	gp##func = (type)GetProcAddress(ghWintab, #func); \
 	if (!gp##func){ WACOM_ASSERT(FALSE); UnloadWintab(); return FALSE; }
 
-//////////////////////////////////////////////////////////////////////////////
-// Purpose
-//		Find wintab32.dll and load it.  
-//		Find the exported functions we need from it.
-//
-//	Returns
-//		TRUE on success.
-//		FALSE on failure.
-//
+// Find wintab32.dll and load it.  
+// Find the exported functions we need from it.
 BOOL LoadWintab(void)
 {
-	//	ghWintab = LoadLibraryA(  "C:\\dev\\mainline\\Wacom\\Win\\Win32\\Debug\\Wacom_Tablet.dll" );
-	//	ghWintab = LoadLibraryA(  "C:\\dev\\mainline\\Wacom\\Win\\Win32\\Debug\\Wintab32.dll" );	
 	ghWintab = LoadLibraryA("Wintab32.dll");
 
 	if (!ghWintab)
@@ -74,22 +64,14 @@ BOOL LoadWintab(void)
 	GETPROCADDRESS(WTMGROPEN, WTMgrOpen);
 	GETPROCADDRESS(WTMGRCLOSE, WTMgrClose);
 	GETPROCADDRESS(WTMGRDEFCONTEXT, WTMgrDefContext);
-	GETPROCADDRESS(WTMGRDEFCONTEXTEX, WTMgrDefContextEx);
+	//GETPROCADDRESS(WTMGRDEFCONTEXTEX, WTMgrDefContextEx);
 
 
-	// TODO - don't forget to NULL out pointers in UnloadWintab().
+	// NOTE: don't forget to NULL out pointers in UnloadWintab().
 	return TRUE;
 }
 
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Purpose
-//		Uninitializes use of wintab32.dll
-//
-// Returns
-//		Nothing.
-//
+// Uninitializes use of wintab32.dll
 void UnloadWintab(void)
 {
 	WACOM_TRACE("UnloadWintab()\n");
@@ -122,12 +104,7 @@ void UnloadWintab(void)
 	gpWTMgrDefContextEx = NULL;
 }
 
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Purpose
-//		Display error to user.
-//
+// Display error to user.
 void ShowError(char *pszErrorMessage)
 {
 	WACOM_TRACE("ShowError()\n");
@@ -135,10 +112,8 @@ void ShowError(char *pszErrorMessage)
 	WACOM_TRACE(pszErrorMessage);
 }
 
-
 #ifdef WACOM_DEBUG
 
-//////////////////////////////////////////////////////////////////////////////
 void WacomTrace(char *lpszFormat, ...)
 {
 	char szTraceMessage[128];

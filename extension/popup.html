@@ -2,8 +2,6 @@
 <html>
 <head>
 	<title>Stylus Pressure</title>
-	<style>
-	</style>
 	<script src="popup.js"></script>
 </head>
 <body style="min-width: 200px;">
@@ -12,11 +10,15 @@
 	</div>
 	<div id="message-install" style="display: none;">
 		Native plugin is not installed, download and install native plugin from
-		<a id="install-link-1" target="_blank">here</a>
+		<a class="install-link" target="_blank">here</a>
 	</div>
 	<div id="message-update" style="display: none;">
 		Native plugin is outdated, download and install latest update from
-		<a id="install-link-1" target="_blank">here</a>
+		<a class="install-link" target="_blank">here</a>
+	</div>
+	<div id="message-upgrade" style="display: none;">
+		New version of plugin is available, download and install latest update from
+		<a class="install-link" target="_blank">here</a>
 	</div>
 	<div id="message-notsupported" style="display: none;">
 		Plugin is not supported on your OS, it is supported only on Windows platform at the momment.

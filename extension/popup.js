@@ -3,10 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	var error = chrome.extension.getBackgroundPage().popupError;
 	var installUrl = chrome.extension.getBackgroundPage().nativeInstallUrl;
 	var errorDiv = document.getElementById('message-' + message);
+	var links = document.querySelectorAll('.install-link');
+
+	for (var i = 0; i < links.length; i++)
+		links.item(i).href = installUrl;
 
 	document.getElementById('restart').onclick = chrome.extension.getBackgroundPage().restart;
-	document.getElementById('install-link-1').href = installUrl;
-	document.getElementById('install-link-2').href = installUrl;
 
 	if (errorDiv)
 		errorDiv.style.display = 'block';

@@ -1,5 +1,6 @@
-var nativeInstallUrl = 'https://github.com/Agamnentzar/chrome-stylus-pressure/releases/download/1.0.1/StylusPressurePlugin.msi';
-var nativePluginVersion = '1.0.0';
+var nativeInstallUrl = 'https://github.com/Agamnentzar/chrome-stylus-pressure/releases/download/1.0.3/StylusPressurePlugin.msi';
+var latestNativePluginVersion = '1.0.3';
+var minimumNativePluginVersion = '1.0.0';
 var nativePort = null;
 var popupMessage = 'ok';
 var popupError = null;
@@ -58,8 +59,10 @@ function connectNativePort() {
 				send({ connected: connected });
 			}
 
-			if (msg.version && nativePluginVersion > msg.version)
+			if (msg.version && minimumNativePluginVersion > msg.version)
 				updatePopup('error.png', 'update', null);
+			else if (msg.version && latestNativePluginVersion > msg.version)
+				updatePopup('warning.png', 'upgrade', null);
 
 			send(msg);
 		});
