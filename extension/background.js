@@ -12,7 +12,7 @@ var restart = function () {
 	if (nativePort) {
 		nativePort.disconnect();
 		nativePort = null;
-		timeout = setTimeout(connectNativePort, 1000);
+		timeout = setTimeout(connectNativePort, 500);
 	}
 };
 
@@ -59,10 +59,11 @@ function connectNativePort() {
 				send({ connected: connected });
 			}
 
-			if (msg.version && minimumNativePluginVersion > msg.version)
+			if (msg.version && minimumNativePluginVersion > msg.version) {
 				updatePopup('error.png', 'update', null);
-			else if (msg.version && latestNativePluginVersion > msg.version)
+			} else if (msg.version && latestNativePluginVersion > msg.version) {
 				updatePopup('warning.png', 'upgrade', null);
+			}
 
 			send(msg);
 		});
@@ -108,8 +109,8 @@ if (os === 'Windows' || os === 'Linux') {
 		});
 
 		port.onMessage.addListener(function (msg) {
-			if (nativePort)
-				nativePort.postMessage(msg);
+			if (msg === 'restart') restart();
+			else if (nativePort) nativePort.postMessage(msg);
 			//log('posting: ' + (nativePort ? 'true' : 'false') + ' ' + JSON.stringify(msg));
 		});
 

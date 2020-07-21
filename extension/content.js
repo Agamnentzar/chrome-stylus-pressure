@@ -25,6 +25,9 @@ function main(window, runtimeId) {
 				port.postMessage('focus');
 			}
 		},
+		restart: function () {
+			
+		},
 	};
 	var port = chrome.runtime.connect(runtimeId);
 

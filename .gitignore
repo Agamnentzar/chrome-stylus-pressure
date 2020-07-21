@@ -5,3 +5,4 @@ build
 .vs
 *.sdf
 *.vcxproj.user
+*.VC.db
