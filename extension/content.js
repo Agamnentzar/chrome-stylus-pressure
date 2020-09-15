@@ -34,15 +34,15 @@ function main(window, runtimeId) {
 	});
 
 	port.onMessage.addListener(function (msg) {
-		if (typeof msg.name !== 'undefined')
+		if (typeof msg.name !== 'undefined') {
 			pen.name = name;
+		}
 
 		if (typeof msg.p !== 'undefined') {
 			pen.pressure = msg.p;
 			error = null;
 
-			if (tablet.gotPressure)
-				tablet.gotPressure(msg.p);
+			if (tablet.gotPressure) tablet.gotPressure(msg.p, msg.b);
 		}
 
 		if (typeof msg.connected !== 'undefined') {
@@ -50,8 +50,7 @@ function main(window, runtimeId) {
 			//console.log('connected', connected);
 		}
 
-		if (typeof msg.log !== 'undefined')
-			console.log(msg.log);
+		if (typeof msg.log !== 'undefined') console.log(msg.log);
 
 		if (typeof msg.error !== 'undefined') {
 			var errorMessage = msg.errorMessage || msg.error;
@@ -81,7 +80,11 @@ function main(window, runtimeId) {
 	window.Tablet = tablet;
 }
 
-var code = '(' + main.toString() + ')(window, "' + chrome.runtime.id + '");';
-var script = document.createElement('script');
-script.appendChild(document.createTextNode(code));
-(document.body || document.head || document.documentElement).appendChild(script);
+// var link = document.querySelector('link[rel="chrome-webstore-item"]');
+// var linkHref = link && link.getAttribute('href');
+// if (linkHref && linkHref.indexOf(chrome.runtime.id) !== -1) {
+	var code = '(' + main.toString() + ')(window, "' + chrome.runtime.id + '");';
+	var script = document.createElement('script');
+	script.appendChild(document.createTextNode(code));
+	(document.body || document.head || document.documentElement).appendChild(script);
+// }
