@@ -105,17 +105,14 @@ void UnloadWintab(void)
 }
 
 // Display error to user.
-void ShowError(char *pszErrorMessage)
-{
+void ShowError(char *pszErrorMessage) {
 	WACOM_TRACE("ShowError()\n");
 	WACOM_ASSERT(pszErrorMessage);
 	WACOM_TRACE(pszErrorMessage);
 }
 
 #ifdef WACOM_DEBUG
-
-void WacomTrace(char *lpszFormat, ...)
-{
+void WacomTrace(char *lpszFormat, ...) {
 	char szTraceMessage[128];
 
 	int nBytesWritten;
@@ -126,18 +123,12 @@ void WacomTrace(char *lpszFormat, ...)
 
 	va_start(args, lpszFormat);
 
-	nBytesWritten = _vsnprintf(szTraceMessage, sizeof(szTraceMessage) - 1,
-		lpszFormat, args);
+	nBytesWritten = _vsnprintf(szTraceMessage, sizeof(szTraceMessage) - 1, lpszFormat, args);
 
-	if (nBytesWritten > 0)
-	{
-		char szHeader[128];
-		sprintf(szHeader, "[%s]: ", "test");
-		OutputDebugStringA(szHeader);
-		OutputDebugStringA(szTraceMessage);
+	if (nBytesWritten > 0) {
+		printf("[test] %s", szTraceMessage);
 	}
 
 	va_end(args);
 }
-
-#endif // WACOM_DEBUG
+#endif

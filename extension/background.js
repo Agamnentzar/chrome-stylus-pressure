@@ -1,5 +1,5 @@
-var nativeInstallUrl = 'https://github.com/Agamnentzar/chrome-stylus-pressure/releases/download/1.1.0/StylusPressurePlugin.msi';
-var latestNativePluginVersion = '1.1.0';
+var nativeInstallUrl = 'https://github.com/Agamnentzar/chrome-stylus-pressure/releases/download/1.2.0/StylusPressurePlugin.msi';
+var latestNativePluginVersion = '1.2.0';
 var minimumNativePluginVersion = '1.0.0';
 var nativePort = null;
 var popupMessage = 'ok';

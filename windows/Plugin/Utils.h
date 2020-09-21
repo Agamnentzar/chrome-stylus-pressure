@@ -7,9 +7,9 @@
 		 
 #include "wintab.h" // NOTE: get from wactab header package
 
-
-//////////////////////////////////////////////////////////////////////////////
+#ifdef DEBUG
 #define WACOM_DEBUG
+#endif
 
 // Ignore warnings about using unsafe string functions.
 #pragma warning( disable : 4996 )
@@ -84,4 +84,3 @@ void WacomTrace(char *lpszFormat, ...);
 #define WACOM_ASSERT( x )
 
 #endif // WACOM_DEBUG
-

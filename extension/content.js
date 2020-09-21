@@ -35,7 +35,7 @@ function main(window, runtimeId) {
 
 	port.onMessage.addListener(function (msg) {
 		if (typeof msg.name !== 'undefined') {
-			pen.name = name;
+			pen.name = msg.name;
 		}
 
 		if (typeof msg.p !== 'undefined') {

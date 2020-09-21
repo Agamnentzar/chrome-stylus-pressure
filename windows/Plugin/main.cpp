@@ -22,7 +22,7 @@
 #define WM_FOCUS_TABLET (WM_APP + 0x0001)
 #define WM_BLUR_TABLET (WM_APP + 0x0002)
 
-const char* version = "1.1.0";
+const char* version = "1.2.0";
 
 struct TabletInfo {
 	int maxPressure;
@@ -49,31 +49,33 @@ void SendError(const char* error) {
 }
 
 BOOL NEAR OpenTabletContexts(HWND hWnd) {
-	int ctxIndex = 0;
 	gnOpenContexts = 0;
 	gnAttachedDevices = 0;
-	std::stringstream szTabletName;
-
 	gContextMap.clear();
 
 	gpWTInfoA(WTI_INTERFACE, IFC_NDEVICES, &gnAttachedDevices);
-	WacomTrace("Number of attached devices: %i\n", gnAttachedDevices);
+	WACOM_TRACE("Number of attached devices: %i\n", gnAttachedDevices);
 
 	// Open/save contexts until first failure to open a context.
 	// Note that gpWTInfoA(WTI_STATUS, STA_CONTEXTS, &nOpenContexts);
 	// will not always let you enumerate through all contexts.
-	do {
+	for (int ctxIndex = 0; ctxIndex < 5; ctxIndex++) {
 		LOGCONTEXT lcMine = { 0 };
 		UINT wWTInfoRetVal = 0;
-		//		AXIS TabletX = { 0 };
-		//		AXIS TabletY = { 0 };
+		// AXIS TabletX = { 0 };
+		// AXIS TabletY = { 0 };
 		AXIS Pressure = { 0 };
 
-		WacomTrace("Getting info on contextIndex: %i ...\n", ctxIndex);
+		WACOM_TRACE("Getting info on contextIndex: %i ...\n", ctxIndex);
 
 		int foundCtx = gpWTInfoA(WTI_DDCTXS + ctxIndex, 0, &lcMine);
 
-		if (foundCtx > 0) {
+		if (foundCtx == 0) {
+			// use global context if can't get local one
+			gpWTInfoA(WTI_DEFSYSCTX, 0, &lcMine);
+		}
+
+		//if (foundCtx > 0) {
 			lcMine.lcPktData = PACKETDATA;
 			lcMine.lcOptions |= CXO_MESSAGES;
 			lcMine.lcOptions |= CXO_SYSTEM;
@@ -86,18 +88,18 @@ BOOL NEAR OpenTabletContexts(HWND hWnd) {
 			//
 			//			if (wWTInfoRetVal != sizeof(AXIS))
 			//			{
-			//				WacomTrace("This context should not be opened.\n");
+			//				WACOM_TRACE("This context should not be opened.\n");
 			//				continue;
 			//			}
 			//
 			//			wWTInfoRetVal = gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_Y, &TabletY);
 
 			if (gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_NPRESSURE, &Pressure) != sizeof(AXIS)) {
-				WacomTrace("This context should not be opened.\n");
+				WACOM_TRACE("This context should not be opened.\n");
 				continue;
 			}
 
-			WacomTrace("Pressure: %i, %i\n", Pressure.axMin, Pressure.axMax);
+			WACOM_TRACE("Pressure: %i, %i\n", Pressure.axMin, Pressure.axMax);
 
 			//			lcMine.lcInOrgX = 0;
 			//			lcMine.lcInOrgY = 0;
@@ -121,24 +123,21 @@ BOOL NEAR OpenTabletContexts(HWND hWnd) {
 
 			if (hCtx) {
 				TabletInfo info = { Pressure.axMax };
-
 				gpWTInfoA(WTI_DEVICES + ctxIndex, CSR_NAME, info.name);
 				gContextMap[hCtx] = info;
-				WacomTrace("Opened context: 0x%X for ctxIndex: %i\n", hCtx, ctxIndex);
+				WACOM_TRACE("Opened context: 0x%X for ctxIndex: %d\n", hCtx, ctxIndex);
 				gnOpenContexts++;
 			} else {
-				WacomTrace("Did NOT open context for ctxIndex: %i\n", ctxIndex);
+				WACOM_TRACE("Did NOT open context for ctxIndex: %d\n", ctxIndex);
 			}
-		} else {
-			WacomTrace("No context info for ctxIndex: %i, bailing out...\n", ctxIndex);
-			break;
-		}
-
-		ctxIndex++;
-	} while (TRUE);
+		//} else {
+		//	WACOM_TRACE("No context info for ctxIndex: %d, found: %d bailing out...\n", ctxIndex, foundCtx);
+		//	break;
+		//}
+	}
 
 	if (gnOpenContexts < gnAttachedDevices) {
-		WacomTrace("Oops - did not open a context for each attached device");
+		WACOM_TRACE("Did not open a context for each attached device");
 	}
 
 	return gnAttachedDevices > 0;
@@ -147,7 +146,7 @@ BOOL NEAR OpenTabletContexts(HWND hWnd) {
 void CloseTabletContexts() {
 	for (auto& ctx : gContextMap) {
 		HCTX hCtx = ctx.first;
-		WacomTrace("Closing context: 0x%X\n", hCtx);
+		WACOM_TRACE("Closing context: 0x%X\n", hCtx);
 		gpWTClose(hCtx);
 	}
 
@@ -158,7 +157,7 @@ void CloseTabletContexts() {
 
 LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARAM lParam) {
 	static HCTX hctx = NULL;
-	PACKET pkt;
+	PACKET pkt = {};
 
 	switch (message) {
 	case WM_FOCUS_TABLET:
@@ -171,21 +170,20 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 
 	case WM_CREATE:
 		if (!OpenTabletContexts(hWnd)) {
-			//SendError("no tablets found");
-			WacomTrace("No tablets found.");
+			WACOM_TRACE("No tablets found.");
 		}
 		break;
 
 	case WT_PACKET: {
 		hctx = (HCTX)lParam;
 
-		if (gpWTPacket(hctx, wParam, &pkt)) {
+		if (hctx && gpWTPacket(hctx, wParam, &pkt)) {
 			double pressure = (double)pkt.pkNormalPressure / (double)gContextMap[hctx].maxPressure;
 			sprintf_s(buffer, "{\"p\":%f,\"b\":%d}", pressure, pkt.pkCursor);
 			SendData(buffer);
 		} else {
 			SendError("got pinged by an unknown context");
-			WacomTrace("Oops - got pinged by an unknown context: 0x%X", hctx);
+			WACOM_TRACE("Got pinged by an unknown context: 0x%X", hctx);
 		}
 	}
 	break;
@@ -193,7 +191,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	case WT_INFOCHANGE: {
 		int nAttachedDevices = 0;
 		gpWTInfoA(WTI_INTERFACE, IFC_NDEVICES, &nAttachedDevices);
-		WacomTrace("WT_INFOCHANGE detected; number of connected tablets is now: %i\n", nAttachedDevices);
+		WACOM_TRACE("WT_INFOCHANGE detected; number of connected tablets is now: %i\n", nAttachedDevices);
 
 		if (nAttachedDevices != gnAttachedDevices) {
 			// kill all current tablet contexts
@@ -210,7 +208,7 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 
 		if (gnAttachedDevices == 0) {
 			//SendError("no tablets found");
-			WacomTrace("No tablets found.");
+			WACOM_TRACE("No tablets found.");
 		}
 	}
 	break;
@@ -219,15 +217,15 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		hctx = (HCTX)wParam;
 		bool entering = (HIWORD(lParam) != 0);
 
-		if (entering) {
+		if (hctx && entering) {
 			if (gContextMap.count(hctx) > 0) {
 				auto info = gContextMap[hctx];
-				WacomTrace("Tablet name: %s count: %i\n", info.name, gnAttachedDevices);
+				WACOM_TRACE("Tablet name: %s count: %i\n", info.name, gnAttachedDevices);
 				sprintf_s(buffer, "{\"name\":\"%s\"}", info.name);
 				SendData(buffer);
 			} else {
 				SendError("couldn't find context");
-				WacomTrace("Oops - couldn't find context: 0x%X\n", hctx);
+				WACOM_TRACE("Couldn't find context: 0x%X\n", hctx);
 			}
 		}
 	}
@@ -317,10 +315,12 @@ int main() {
 	DWORD threadId = 0;
 	HANDLE thread = CreateThread(NULL, 0, ThreadFunc, NULL, 0, &threadId);
 
-	//while (1) {
-	//	::Sleep(5000);
-	//	PostMessage(hWnd, WM_FOCUS_TABLET, 0, 0);
-	//}
+#ifdef DEBUG
+	while (1) {
+		::Sleep(5000);
+		PostMessage(hWnd, WM_FOCUS_TABLET, 0, 0);
+	}
+#endif
 
 	while (fread(&length, 4, 1, stdin)) {
 		if (length > 1023 || fread(buffer, 1, length, stdin) != length)

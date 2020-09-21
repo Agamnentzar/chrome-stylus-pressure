@@ -21,7 +21,7 @@ extern "C" {
 #ifndef NOWTMESSAGES
 
 	#define WT_DEFBASE			0x7FF0
-	#define WT_MAXOFFSET			0xF
+	#define WT_MAXOFFSET		0xF
 
 	#define _WT_PACKET(b)		((b)+0)
 	#define _WT_CTXOPEN(b)		((b)+1)
@@ -34,16 +34,16 @@ extern "C" {
 	#define _WT_PACKETEXT(b)	((b)+8) /* 1.4 */
 	#define _WT_MAX(b)			((b)+WT_MAXOFFSET)
 	
-	#define WT_PACKET				_WT_PACKET(WT_DEFBASE)
+	#define WT_PACKET			_WT_PACKET(WT_DEFBASE)
 	#define WT_CTXOPEN			_WT_CTXOPEN(WT_DEFBASE)
 	#define WT_CTXCLOSE			_WT_CTXCLOSE(WT_DEFBASE)
-	#define WT_CTXUPDATE			_WT_CTXUPDATE(WT_DEFBASE)
+	#define WT_CTXUPDATE		_WT_CTXUPDATE(WT_DEFBASE)
 	#define WT_CTXOVERLAP		_WT_CTXOVERLAP(WT_DEFBASE)
-	#define WT_PROXIMITY			_WT_PROXIMITY(WT_DEFBASE)
+	#define WT_PROXIMITY		_WT_PROXIMITY(WT_DEFBASE)
 	#define WT_INFOCHANGE		_WT_INFOCHANGE(WT_DEFBASE)
-	#define WT_CSRCHANGE			_WT_CSRCHANGE(WT_DEFBASE) /* 1.1 */
-	#define WT_PACKETEXT			_WT_PACKETEXT(WT_DEFBASE) /* 1.4 */
-	#define WT_MAX					_WT_MAX(WT_DEFBASE)
+	#define WT_CSRCHANGE		_WT_CSRCHANGE(WT_DEFBASE) /* 1.1 */
+	#define WT_PACKETEXT		_WT_PACKETEXT(WT_DEFBASE) /* 1.4 */
+	#define WT_MAX				_WT_MAX(WT_DEFBASE)
 
 #endif
 
@@ -58,24 +58,24 @@ DECLARE_HANDLE(HMGR);		/* manager handle */
 DECLARE_HANDLE(HCTX);		/* context handle */
 DECLARE_HANDLE(HWTHOOK);	/* hook handle */
 
-typedef DWORD WTPKT;			/* packet mask */
+typedef DWORD WTPKT;		/* packet mask */
 
 
 #ifndef NOWTPKT
 
 	/* WTPKT bits */
 	#define PK_CONTEXT				0x0001	/* reporting context */
-	#define PK_STATUS					0x0002	/* status bits */
+	#define PK_STATUS				0x0002	/* status bits */
 	#define PK_TIME					0x0004	/* time stamp */
 	#define PK_CHANGED				0x0008	/* change bit vector */
 	#define PK_SERIAL_NUMBER		0x0010	/* packet serial number */
-	#define PK_CURSOR					0x0020	/* reporting cursor */
+	#define PK_CURSOR				0x0020	/* reporting cursor */
 	#define PK_BUTTONS				0x0040	/* button information */
-	#define PK_X						0x0080	/* x axis */
-	#define PK_Y						0x0100	/* y axis */
-	#define PK_Z						0x0200	/* z axis */
+	#define PK_X					0x0080	/* x axis */
+	#define PK_Y					0x0100	/* y axis */
+	#define PK_Z					0x0200	/* z axis */
 	#define PK_NORMAL_PRESSURE		0x0400	/* normal or tip pressure */
-	#define PK_TANGENT_PRESSURE	0x0800	/* tangential or barrel pressure */
+	#define PK_TANGENT_PRESSURE	    0x0800	/* tangential or barrel pressure */
 	#define PK_ORIENTATION			0x1000	/* orientation info: tilts */
 	#define PK_ROTATION				0x2000	/* rotation info; 1.1 */
 
@@ -84,17 +84,17 @@ typedef DWORD WTPKT;			/* packet mask */
 typedef DWORD FIX32;				/* fixed-point arithmetic type */
 
 #ifndef NOFIX32
-	#define INT(x)			HIWORD(x)
+	#define INT(x)		HIWORD(x)
 	#define FRAC(x)		LOWORD(x)
 
 	#define CASTFIX32(x)	((FIX32)((x)*65536L))
 
 	#define ROUND(x)		(INT(x) + (FRAC(x) > (WORD)0x8000))
 
-	#define FIX_MUL(c, a, b)							\
+	#define FIX_MUL(c, a, b)						\
 		(c = (((DWORD)FRAC(a) * FRAC(b)) >> 16) +	\
-			(DWORD)INT(a) * FRAC(b) +					\
-			(DWORD)INT(b) * FRAC(a) +					\
+			(DWORD)INT(a) * FRAC(b) +				\
+			(DWORD)INT(b) * FRAC(a) +				\
 			((DWORD)INT(a) * INT(b) << 16))
 
 	#ifdef _WINDLL
@@ -104,24 +104,23 @@ typedef DWORD FIX32;				/* fixed-point arithmetic type */
 	#endif
 
 	#define FIX_DIV(c, a, b)						\
-		{													\
-			FIX_DIV_SC DWORD temp, rem, btemp;	\
-															\
+		{											\
+			FIX_DIV_SC DWORD temp, rem, btemp;		\
+													\
 			/* fraction done bytewise */			\
 			temp = ((a / b) << 16);					\
-			rem = a % b;								\
-			btemp = b;									\
+			rem = a % b;							\
+			btemp = b;								\
 			if (INT(btemp) < 256) {					\
-				rem <<= 8;								\
-			}												\
-			else {										\
-				btemp >>= 8;							\
-			}												\
+				rem <<= 8;							\
+			} else {									\
+				btemp >>= 8;						\
+			}										\
 			temp += ((rem / btemp) << 8);			\
-			rem %= btemp;								\
-			rem <<= 8;									\
-			temp += rem / btemp;						\
-			c = temp;									\
+			rem %= btemp;							\
+			rem <<= 8;								\
+			temp += rem / btemp;					\
+			c = temp;								\
 		}
 #endif
 
@@ -150,16 +149,16 @@ typedef struct tagAXIS {
 #ifndef NOWTSYSBUTTONS
 
 /* system button assignment values */
-#define SBN_NONE			0x00
+#define SBN_NONE		0x00
 #define SBN_LCLICK		0x01
 #define SBN_LDBLCLICK	0x02
-#define SBN_LDRAG			0x03
+#define SBN_LDRAG		0x03
 #define SBN_RCLICK		0x04
 #define SBN_RDBLCLICK	0x05
-#define SBN_RDRAG			0x06
+#define SBN_RDRAG		0x06
 #define SBN_MCLICK		0x07
 #define SBN_MDBLCLICK	0x08
-#define SBN_MDRAG			0x09
+#define SBN_MDRAG		0x09
 /* for Pen Windows */
 #define SBN_PTCLICK		0x10
 #define SBN_PTDBLCLICK	0x20
@@ -183,8 +182,8 @@ typedef struct tagAXIS {
 
 /* hardware capabilities */
 #define HWC_INTEGRATED		0x0001
-#define HWC_TOUCH				0x0002
-#define HWC_HARDPROX			0x0004
+#define HWC_TOUCH			0x0002
+#define HWC_HARDPROX		0x0004
 #define HWC_PHYSID_CURSORS	0x0008 /* 1.1 */
 #endif
 
@@ -201,11 +200,11 @@ typedef struct tagAXIS {
 
 /* info categories */
 #define WTI_INTERFACE		1
-	#define IFC_WINTABID			1
+	#define IFC_WINTABID		1
 	#define IFC_SPECVERSION		2
 	#define IFC_IMPLVERSION		3
-	#define IFC_NDEVICES			4
-	#define IFC_NCURSORS			5
+	#define IFC_NDEVICES		4
+	#define IFC_NCURSORS		5
 	#define IFC_NCONTEXTS		6
 	#define IFC_CTXOPTIONS		7
 	#define IFC_CTXSAVESIZE		8
@@ -219,11 +218,11 @@ typedef struct tagAXIS {
 #ifndef NOWTSTATUS
 
 #define WTI_STATUS			2
-	#define STA_CONTEXTS			1
+	#define STA_CONTEXTS		1
 	#define STA_SYSCTXS			2
 	#define STA_PKTRATE			3
 	#define STA_PKTDATA			4
-	#define STA_MANAGERS			5
+	#define STA_MANAGERS		5
 	#define STA_SYSTEM			6
 	#define STA_BUTTONUSE		7
 	#define STA_SYSBTNUSE		8
@@ -237,16 +236,16 @@ typedef struct tagAXIS {
 #define WTI_DEFSYSCTX	4
 #define WTI_DDCTXS		400 /* 1.1 */
 #define WTI_DSCTXS		500 /* 1.1 */
-	#define CTX_NAME			1
+	#define CTX_NAME		1
 	#define CTX_OPTIONS		2
 	#define CTX_STATUS		3
-	#define CTX_LOCKS			4
+	#define CTX_LOCKS		4
 	#define CTX_MSGBASE		5
 	#define CTX_DEVICE		6
 	#define CTX_PKTRATE		7
 	#define CTX_PKTDATA		8
 	#define CTX_PKTMODE		9
-	#define CTX_MOVEMASK		10
+	#define CTX_MOVEMASK	10
 	#define CTX_BTNDNMASK	11
 	#define CTX_BTNUPMASK	12
 	#define CTX_INORGX		13
@@ -261,16 +260,16 @@ typedef struct tagAXIS {
 	#define CTX_OUTEXTX		22
 	#define CTX_OUTEXTY		23
 	#define CTX_OUTEXTZ		24
-	#define CTX_SENSX			25
-	#define CTX_SENSY			26
-	#define CTX_SENSZ			27
+	#define CTX_SENSX		25
+	#define CTX_SENSY		26
+	#define CTX_SENSZ		27
 	#define CTX_SYSMODE		28
 	#define CTX_SYSORGX		29
 	#define CTX_SYSORGY		30
 	#define CTX_SYSEXTX		31
 	#define CTX_SYSEXTY		32
-	#define CTX_SYSSENSX		33
-	#define CTX_SYSSENSY		34
+	#define CTX_SYSSENSX	33
+	#define CTX_SYSSENSY	34
 	#define CTX_MAX			34
 
 #endif
@@ -278,10 +277,10 @@ typedef struct tagAXIS {
 #ifndef NOWTDEVICES
 
 #define WTI_DEVICES		100
-	#define DVC_NAME			1
-	#define DVC_HARDWARE		2
+	#define DVC_NAME		1
+	#define DVC_HARDWARE	2
 	#define DVC_NCSRTYPES	3
-	#define DVC_FIRSTCSR		4
+	#define DVC_FIRSTCSR	4
 	#define DVC_PKTRATE		5
 	#define DVC_PKTDATA		6
 	#define DVC_PKTMODE		7
@@ -289,14 +288,14 @@ typedef struct tagAXIS {
 	#define DVC_XMARGIN		9
 	#define DVC_YMARGIN		10
 	#define DVC_ZMARGIN		11
-	#define DVC_X				12
-	#define DVC_Y				13
-	#define DVC_Z				14
+	#define DVC_X			12
+	#define DVC_Y			13
+	#define DVC_Z			14
 	#define DVC_NPRESSURE	15
 	#define DVC_TPRESSURE	16
 	#define DVC_ORIENTATION	17
-	#define DVC_ROTATION		18 /* 1.1 */
-	#define DVC_PNPID			19 /* 1.1 */
+	#define DVC_ROTATION	18 /* 1.1 */
+	#define DVC_PNPID		19 /* 1.1 */
 	#define DVC_MAX			19
 
 #endif
@@ -304,26 +303,26 @@ typedef struct tagAXIS {
 #ifndef NOWTCURSORS
 
 #define WTI_CURSORS			200
-	#define CSR_NAME				1
+	#define CSR_NAME			1
 	#define CSR_ACTIVE			2
 	#define CSR_PKTDATA			3
 	#define CSR_BUTTONS			4
 	#define CSR_BUTTONBITS		5
-	#define CSR_BTNNAMES			6
+	#define CSR_BTNNAMES		6
 	#define CSR_BUTTONMAP		7
 	#define CSR_SYSBTNMAP		8
-	#define CSR_NPBUTTON			9
+	#define CSR_NPBUTTON		9
 	#define CSR_NPBTNMARKS		10
 	#define CSR_NPRESPONSE		11
-	#define CSR_TPBUTTON			12
+	#define CSR_TPBUTTON		12
 	#define CSR_TPBTNMARKS		13
 	#define CSR_TPRESPONSE		14
 	#define CSR_PHYSID			15 /* 1.1 */
-	#define CSR_MODE				16 /* 1.1 */
+	#define CSR_MODE			16 /* 1.1 */
 	#define CSR_MINPKTDATA		17 /* 1.1 */
 	#define CSR_MINBUTTONS		18 /* 1.1 */
 	#define CSR_CAPABILITIES	19 /* 1.1 */
-	#define CSR_TYPE				20 /* 1.2 */
+	#define CSR_TYPE			20 /* 1.2 */
 	#define CSR_MAX				20
 
 #endif
@@ -331,11 +330,11 @@ typedef struct tagAXIS {
 #ifndef NOWTEXTENSIONS
 
 #define WTI_EXTENSIONS	300
-	#define EXT_NAME			1
+	#define EXT_NAME		1
 	#define EXT_TAG			2
-	#define EXT_MASK			3
-	#define EXT_SIZE			4
-	#define EXT_AXES			5
+	#define EXT_MASK		3
+	#define EXT_SIZE		4
+	#define EXT_AXES		5
 	#define EXT_DEFAULT		6
 	#define EXT_DEFCONTEXT	7
 	#define EXT_DEFSYSCTX	8
@@ -350,7 +349,7 @@ typedef struct tagAXIS {
 /* -------------------------------------------------------------------------- */
 /* CONTEXT DATA DEFS */
 
-#define LCNAMELEN		40
+#define LCNAMELEN	40
 #define LC_NAMELEN	40
 #ifdef WIN32
 typedef struct tagLOGCONTEXTA {
@@ -478,19 +477,19 @@ typedef struct tagLOGCONTEXT {
 	/* context option values */
 	#define CXO_SYSTEM		0x0001
 	#define CXO_PEN			0x0002
-	#define CXO_MESSAGES		0x0004
+	#define CXO_MESSAGES	0x0004
 	#define CXO_MARGIN		0x8000
 	#define CXO_MGNINSIDE	0x4000
 	#define CXO_CSRMESSAGES	0x0008 /* 1.1 */
 
 	/* context status values */
-	#define CXS_DISABLED		0x0001
-	#define CXS_OBSCURED		0x0002
-	#define CXS_ONTOP			0x0004
+	#define CXS_DISABLED	0x0001
+	#define CXS_OBSCURED	0x0002
+	#define CXS_ONTOP		0x0004
 
 	/* context lock values */
 	#define CXL_INSIZE		0x0001
-	#define CXL_INASPECT		0x0002
+	#define CXL_INASPECT	0x0002
 	#define CXL_SENSITIVITY	0x0004
 	#define CXL_MARGIN		0x0008
 	#define CXL_SYSOUT		0x0010
@@ -504,7 +503,7 @@ typedef struct tagLOGCONTEXT {
 #define TPS_PROXIMITY		0x0001
 #define TPS_QUEUE_ERR		0x0002
 #define TPS_MARGIN			0x0004
-#define TPS_GRAB				0x0008
+#define TPS_GRAB			0x0008
 #define TPS_INVERT			0x0010 /* 1.1 */
 
 typedef struct tagORIENTATION {
@@ -546,15 +545,15 @@ typedef struct tagROTATION { /* 1.1 */
 
 #ifndef NOWTHOOKS
 
-#define WTH_PLAYBACK			1
+#define WTH_PLAYBACK		1
 #define WTH_RECORD			2
 
 #define WTHC_GETLPLPFN		(-3)
 #define WTHC_LPLPFNNEXT		(-2)
 #define WTHC_LPFNNEXT		(-1)
 #define WTHC_ACTION			0
-#define WTHC_GETNEXT			1
-#define WTHC_SKIP				2
+#define WTHC_GETNEXT		1
+#define WTHC_SKIP			2
 
 #endif
 
@@ -579,14 +578,14 @@ typedef struct tagROTATION { /* 1.1 */
 
 /* Extension tags. */
 #define WTX_OBT				0	/* Out of bounds tracking */
-#define WTX_FKEYS				1	/* Function keys */
-#define WTX_TILT				2	/* Raw Cartesian tilt; 1.1 */
+#define WTX_FKEYS			1	/* Function keys */
+#define WTX_TILT			2	/* Raw Cartesian tilt; 1.1 */
 #define WTX_CSRMASK			3	/* select input by cursor type; 1.1 */
-#define WTX_XBTNMASK			4	/* Extended button mask; 1.1 */
+#define WTX_XBTNMASK		4	/* Extended button mask; 1.1 */
 #define WTX_EXPKEYS			5	/* ExpressKeys; 1.3 - DEPRECATED: see WTX_EXPKEYS2 */
 #define WTX_TOUCHSTRIP		6	/* TouchStrips; 1.4 */
 #define WTX_TOUCHRING		7	/* TouchRings; 1.4 */
-#define WTX_EXPKEYS2			8	/* ExpressKeys; 1.4 */
+#define WTX_EXPKEYS2		8	/* ExpressKeys; 1.4 */
 
 typedef struct tagXBTNMASK {
 	BYTE xBtnDnMask[32];
@@ -622,24 +621,24 @@ typedef struct tagSLIDERDATA { /* 1.4 */
 } SLIDERDATA;
 
 typedef struct tagEXTPROPERTY { /* 1.4 */
-	BYTE		version;				// Structure version, 0 for now
+	BYTE		version;			// Structure version, 0 for now
 	BYTE		tabletIndex;		// 0-based index for tablet
 	BYTE		controlIndex;		// 0-based index for control 
 	BYTE		functionIndex;		// 0-based index for control's sub-function
 	WORD		propertyID;			// property ID
 	WORD		reserved;			// DWORD-alignment filler
 	DWORD		dataSize;			// number of bytes in data[] buffer
-	BYTE		data[1];				// raw data
+	BYTE		data[1];			// raw data
 } EXTPROPERTY;
 
-#define TABLET_PROPERTY_CONTROLCOUNT	 0			// UINT32: number of physical controls on tablet
-#define TABLET_PROPERTY_FUNCCOUNT		 1			// UINT32: number of functions of control
-#define TABLET_PROPERTY_AVAILABLE		 2			// BOOL: control/mode is available for override
-#define TABLET_PROPERTY_MIN				 3			// UINT32: minimum value
-#define TABLET_PROPERTY_MAX				 4			// UINT32: maximum value
-#define TABLET_PROPERTY_OVERRIDE			 5			// BOOL: control is overridden
-#define TABLET_PROPERTY_OVERRIDE_NAME	 6			// UTF-8: Displayable name when control is overridden
-#define TABLET_PROPERTY_LOCATION			 11		// UINT32: Physical location of control (see TABLET_LOC_*)
+#define TABLET_PROPERTY_CONTROLCOUNT	 0		// UINT32: number of physical controls on tablet
+#define TABLET_PROPERTY_FUNCCOUNT		 1		// UINT32: number of functions of control
+#define TABLET_PROPERTY_AVAILABLE		 2		// BOOL: control/mode is available for override
+#define TABLET_PROPERTY_MIN				 3		// UINT32: minimum value
+#define TABLET_PROPERTY_MAX				 4		// UINT32: maximum value
+#define TABLET_PROPERTY_OVERRIDE		 5		// BOOL: control is overridden
+#define TABLET_PROPERTY_OVERRIDE_NAME	 6		// UTF-8: Displayable name when control is overridden
+#define TABLET_PROPERTY_LOCATION		 11		// UINT32: Physical location of control (see TABLET_LOC_*)
 
 #define TABLET_LOC_LEFT				0
 #define TABLET_LOC_RIGHT			1
@@ -719,13 +718,13 @@ typedef struct tagEXTPROPERTY { /* 1.4 */
 	int API WTPacketsGet(HCTX, int, LPVOID);
 	#define ORD_WTPacketsGet					23
 	BOOL API WTPacket(HCTX, UINT, LPVOID);
-	#define ORD_WTPacket							24
+	#define ORD_WTPacket						24
 	#endif
 
 	#ifndef NOWTVISIBILITYFXNS
 	/* VISIBILITY FUNCTIONS */
 	BOOL API WTEnable(HCTX, BOOL);
-	#define ORD_WTEnable							40
+	#define ORD_WTEnable						40
 	BOOL API WTOverlap(HCTX, BOOL);
 	#define ORD_WTOverlap						41
 	#endif
@@ -733,7 +732,7 @@ typedef struct tagEXTPROPERTY { /* 1.4 */
 	#ifndef NOWTCTXEDITFXNS
 	/* CONTEXT EDITING FUNCTIONS */
 	BOOL API WTConfig(HCTX, HWND);
-	#define ORD_WTConfig							60
+	#define ORD_WTConfig						60
 #ifdef WIN32
 	BOOL API WTGetA(HCTX, LPLOGCONTEXTA);
 	#define ORD_WTGetA							61
@@ -748,7 +747,7 @@ typedef struct tagEXTPROPERTY { /* 1.4 */
 	#endif /* !UNICODE */
 #else
 	BOOL API WTGet(HCTX, LPLOGCONTEXT);
-	#define ORD_WTGet								61
+	#define ORD_WTGet							61
 #endif
 #ifdef WIN32
 	BOOL API WTSetA(HCTX, LPLOGCONTEXTA);
@@ -764,12 +763,12 @@ typedef struct tagEXTPROPERTY { /* 1.4 */
 	#endif /* !UNICODE */
 #else
 	BOOL API WTSet(HCTX, LPLOGCONTEXT);
-	#define ORD_WTSet								62
+	#define ORD_WTSet							62
 #endif
 	BOOL API WTExtGet(HCTX, UINT, LPVOID);
-	#define ORD_WTExtGet							63
+	#define ORD_WTExtGet						63
 	BOOL API WTExtSet(HCTX, UINT, LPVOID);
-	#define ORD_WTExtSet							64
+	#define ORD_WTExtSet						64
 	BOOL API WTSave(HCTX, LPVOID);
 	#define ORD_WTSave							65
 	HCTX API WTRestore(HWND, LPVOID, BOOL);
@@ -810,7 +809,7 @@ typedef struct tagEXTPROPERTY { /* 1.4 */
 	HWND API WTMgrContextOwner(HMGR, HCTX);
 	#define ORD_WTMgrContextOwner				121
 	HCTX API WTMgrDefContext(HMGR, BOOL);
-	#define ORD_WTMgrDefContext				122
+	#define ORD_WTMgrDefContext					122
 	HCTX API WTMgrDefContextEx(HMGR, UINT, BOOL); /* 1.1 */
 	#define ORD_WTMgrDefContextEx				206
 	#endif
@@ -840,15 +839,15 @@ typedef struct tagEXTPROPERTY { /* 1.4 */
 	#ifndef NOWTMGRPREFFXNS
 	/* MANAGER PREFERENCE DATA FUNCTIONS */
 	BOOL API WTMgrExt(HMGR, UINT, LPVOID);
-	#define ORD_WTMgrExt							180
+	#define ORD_WTMgrExt						180
 	BOOL API WTMgrCsrEnable(HMGR, UINT, BOOL);
 	#define ORD_WTMgrCsrEnable					181
 	BOOL API WTMgrCsrButtonMap(HMGR, UINT, LPBYTE, LPBYTE);
 	#define ORD_WTMgrCsrButtonMap				182
 	BOOL API WTMgrCsrPressureBtnMarks(HMGR, UINT, DWORD, DWORD);
-	#define ORD_WTMgrCsrPressureBtnMarks	183
+	#define ORD_WTMgrCsrPressureBtnMarks		183
 	BOOL API WTMgrCsrPressureResponse(HMGR, UINT, UINT FAR *, UINT FAR *);
-	#define ORD_WTMgrCsrPressureResponse	184
+	#define ORD_WTMgrCsrPressureResponse		184
 	BOOL API WTMgrCsrExt(HMGR, UINT, UINT, LPVOID);
 	#define ORD_WTMgrCsrExt						185
 	#endif
@@ -896,10 +895,10 @@ typedef struct tagEXTPROPERTY { /* 1.4 */
 	#endif /* !UNICODE */
 #else
 	HWTHOOK API WTMgrPacketHookEx(HMGR, int, LPSTR, LPSTR);
-	#define ORD_WTMgrPacketHookEx				203
+	#define ORD_WTMgrPacketHookEx			203
 #endif
 	BOOL API WTMgrPacketUnhook(HWTHOOK);
-	#define ORD_WTMgrPacketUnhook				204
+	#define ORD_WTMgrPacketUnhook			204
 	LRESULT API WTMgrPacketHookNext(HWTHOOK, int, WPARAM, LPARAM);
 	#define ORD_WTMgrPacketHookNext			205
 	#endif
