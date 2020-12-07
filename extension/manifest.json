@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Stylus Pressure",
     "description": "This extension provides stylus pressure information to the browser.",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",
@@ -25,13 +25,15 @@
         {
             "matches": [
                 "*://aggie.io/*",
-                "*://beta.aggie.io/*",
+                "*://*.aggie.io/*",
                 "*://magmaboard.io/*",
                 "*://*.magmaboard.io/*",
                 "*://magmastudio.io/*",
                 "*://*.magmastudio.io/*",
                 "*://magmastudio.app/*",
-                "*://draw.lisek.com/*"
+                "*://*.magmastudio.app/*",
+                "*://magma.space/*",
+                "*://*.magma.space/*"
             ],
             "js": [
                 "content.js"
@@ -41,13 +43,15 @@
     "externally_connectable": {
         "matches": [
             "*://aggie.io/*",
-            "*://beta.aggie.io/*",
+            "*://*.aggie.io/*",
             "*://magmaboard.io/*",
             "*://*.magmaboard.io/*",
             "*://magmastudio.io/*",
             "*://*.magmastudio.io/*",
             "*://magmastudio.app/*",
-            "*://draw.lisek.com/*"
+            "*://*.magmastudio.app/*",
+            "*://magma.space/*",
+            "*://*.magma.space/*"
         ]
     }
 }
