@@ -519,7 +519,7 @@ typedef struct tagROTATION { /* 1.1 */
 } ROTATION, *PROTATION, NEAR *NPROTATION, FAR *LPROTATION;
 // grandfather in obsolete member names.
 #define rotPitch	roPitch
-#define rotRoll	roRoll
+#define rotRoll		roRoll
 #define rotYaw		roYaw
 
 

@@ -11,6 +11,24 @@
 #include <sstream>
 #include <fstream>
 
+
+//#define PK_CONTEXT			0x0001	/* reporting context */
+//#define PK_STATUS				0x0002	/* status bits */
+//#define PK_TIME				0x0004	/* time stamp */
+//#define PK_CHANGED			0x0008	/* change bit vector */
+//#define PK_SERIAL_NUMBER		0x0010	/* packet serial number */
+//#define PK_CURSOR				0x0020	/* reporting cursor */
+//#define PK_BUTTONS			0x0040	/* button information */
+//#define PK_X					0x0080	/* x axis */
+//#define PK_Y					0x0100	/* y axis */
+//#define PK_Z					0x0200	/* z axis */
+//#define PK_NORMAL_PRESSURE	0x0400	/* normal or tip pressure */
+//#define PK_TANGENT_PRESSURE	0x0800	/* tangential or barrel pressure */
+//#define PK_ORIENTATION		0x1000	/* orientation info: tilts */
+//#define PK_ROTATION			0x2000	/* rotation info; 1.1 */
+
+#define PK_ALL 0x3FFF
+
 #define PACKETDATA (PK_X | PK_Y | PK_BUTTONS | PK_NORMAL_PRESSURE | PK_CURSOR)
 #define PACKETMODE PK_BUTTONS
 
@@ -59,8 +77,8 @@ BOOL NEAR OpenTabletContexts(HWND hWnd) {
 	// Open/save contexts until first failure to open a context.
 	// Note that gpWTInfoA(WTI_STATUS, STA_CONTEXTS, &nOpenContexts);
 	// will not always let you enumerate through all contexts.
-	for (int ctxIndex = 0; ctxIndex < 5; ctxIndex++) {
-		LOGCONTEXT lcMine = { 0 };
+	for (int ctxIndex = 0; ctxIndex < gnAttachedDevices; ctxIndex++) {
+		LOGCONTEXTA lcMine = { 0 };
 		UINT wWTInfoRetVal = 0;
 		// AXIS TabletX = { 0 };
 		// AXIS TabletY = { 0 };
@@ -72,16 +90,21 @@ BOOL NEAR OpenTabletContexts(HWND hWnd) {
 
 		if (foundCtx == 0) {
 			// use global context if can't get local one
+			lcMine.lcOptions |= CXO_SYSTEM;
 			gpWTInfoA(WTI_DEFSYSCTX, 0, &lcMine);
 		}
 
 		//if (foundCtx > 0) {
 			lcMine.lcPktData = PACKETDATA;
-			lcMine.lcOptions |= CXO_MESSAGES;
-			lcMine.lcOptions |= CXO_SYSTEM;
+			lcMine.lcOptions |= CXO_MESSAGES | CXO_SYSTEM;
 			lcMine.lcPktMode = PACKETMODE;
 			lcMine.lcMoveMask = PACKETDATA;
 			lcMine.lcBtnUpMask = lcMine.lcBtnDnMask;
+
+			//lcMine.lcOutOrgX = 0;
+			//lcMine.lcOutExtX = lcMine.lcInExtX;
+			//lcMine.lcOutOrgY = 0;
+			//lcMine.lcOutExtY = -lcMine.lcInExtY;
 
 			//			// Set the entire tablet as active
 			//			wWTInfoRetVal = gpWTInfoA(WTI_DEVICES + ctxIndex, DVC_X, &TabletX);
@@ -119,7 +142,7 @@ BOOL NEAR OpenTabletContexts(HWND hWnd) {
 			// lcSysOrgX, lcSysOrgY, lcSysExtX, lcSysExtY
 
 			// Open the context enabled.
-			HCTX hCtx = gpWTOpenA(hWnd, &lcMine, TRUE);
+			HCTX hCtx = gpWTOpenA(hWnd, &lcMine, FALSE);
 
 			if (hCtx) {
 				TabletInfo info = { Pressure.axMax };
@@ -145,9 +168,9 @@ BOOL NEAR OpenTabletContexts(HWND hWnd) {
 
 void CloseTabletContexts() {
 	for (auto& ctx : gContextMap) {
-		HCTX hCtx = ctx.first;
-		WACOM_TRACE("Closing context: 0x%X\n", hCtx);
-		gpWTClose(hCtx);
+		HCTX hctx = ctx.first;
+		WACOM_TRACE("Closing context: 0x%X\n", hctx);
+		gpWTClose(hctx);
 	}
 
 	gContextMap.clear();
@@ -156,37 +179,50 @@ void CloseTabletContexts() {
 }
 
 LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARAM lParam) {
-	static HCTX hctx = NULL;
 	PACKET pkt = {};
 
 	switch (message) {
 	case WM_FOCUS_TABLET:
-		if (hctx) gpWTOverlap(hctx, TRUE);
+		WACOM_TRACE("WM_FOCUS_TABLET.\n");
+		for (auto& ctx : gContextMap) {
+			gpWTEnable(ctx.first, TRUE);
+			gpWTOverlap(ctx.first, TRUE);
+		}
 		break;
 
 	case WM_BLUR_TABLET:
-		if (hctx) gpWTOverlap(hctx, FALSE);
+		WACOM_TRACE("WM_BLUR_TABLET.\n");
+		for (auto& ctx : gContextMap) {
+			gpWTEnable(ctx.first, FALSE);
+			gpWTOverlap(ctx.first, FALSE);
+		}
 		break;
 
 	case WM_CREATE:
 		if (!OpenTabletContexts(hWnd)) {
-			WACOM_TRACE("No tablets found.");
+			WACOM_TRACE("No tablets found.\n");
+		} else {
+			for (auto& ctx : gContextMap) {
+				gpWTEnable(ctx.first, TRUE);
+				gpWTOverlap(ctx.first, TRUE);
+			}
 		}
 		break;
 
 	case WT_PACKET: {
-		hctx = (HCTX)lParam;
+		HCTX hctx = (HCTX)lParam;
 
 		if (hctx && gpWTPacket(hctx, wParam, &pkt)) {
 			double pressure = (double)pkt.pkNormalPressure / (double)gContextMap[hctx].maxPressure;
+			WACOM_TRACE("WT_PACKET x: %d y: %d pres: %d/%d butt: %x\n", pkt.pkX, pkt.pkY, pkt.pkNormalPressure, gContextMap[hctx].maxPressure, pkt.pkButtons);
 			sprintf_s(buffer, "{\"p\":%f,\"b\":%d}", pressure, pkt.pkCursor);
 			SendData(buffer);
 		} else {
 			SendError("got pinged by an unknown context");
-			WACOM_TRACE("Got pinged by an unknown context: 0x%X", hctx);
+			WACOM_TRACE("Got pinged by an unknown context: 0x%X\n", hctx);
 		}
+		break;
 	}
-	break;
 
 	case WT_INFOCHANGE: {
 		int nAttachedDevices = 0;
@@ -194,7 +230,6 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 		WACOM_TRACE("WT_INFOCHANGE detected; number of connected tablets is now: %i\n", nAttachedDevices);
 
 		if (nAttachedDevices != gnAttachedDevices) {
-			// kill all current tablet contexts
 			CloseTabletContexts();
 
 			// Add some delay to give driver a chance to catch up in configuring
@@ -208,19 +243,22 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 
 		if (gnAttachedDevices == 0) {
 			//SendError("no tablets found");
-			WACOM_TRACE("No tablets found.");
+			WACOM_TRACE("No tablets found\n");
 		}
+		break;
 	}
-	break;
 
 	case WT_PROXIMITY: {
-		hctx = (HCTX)wParam;
+		HCTX hctx = (HCTX)wParam;
 		bool entering = (HIWORD(lParam) != 0);
 
+		WACOM_TRACE("PROX %d\n", entering);
+		//WACOM_TRACE("WT_PROXIMITY %d %d\n", hctx, entering);
 		if (hctx && entering) {
+			gpWTEnable(hctx, TRUE);
 			if (gContextMap.count(hctx) > 0) {
 				auto info = gContextMap[hctx];
-				WACOM_TRACE("Tablet name: %s count: %i\n", info.name, gnAttachedDevices);
+				WACOM_TRACE("Tablet name: %s, count: %i\n", info.name, gnAttachedDevices);
 				sprintf_s(buffer, "{\"name\":\"%s\"}", info.name);
 				SendData(buffer);
 			} else {
@@ -228,8 +266,8 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 				WACOM_TRACE("Couldn't find context: 0x%X\n", hctx);
 			}
 		}
+		break;
 	}
-	break;
 
 	case WM_DESTROY:
 		CloseTabletContexts();
@@ -243,7 +281,22 @@ LRESULT FAR PASCAL MainWndProc(HWND hWnd, unsigned message, WPARAM wParam, LPARA
 	return 0;
 }
 
-BOOL InitInstance(HINSTANCE hInstance) {
+DWORD WINAPI ThreadFunc(LPVOID lpParam) {
+	HINSTANCE hInstance = GetModuleHandle(NULL);
+
+	WNDCLASS wc;
+	wc.style = 0;
+	wc.lpfnWndProc = MainWndProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInstance;
+	wc.hIcon = NULL;
+	wc.hCursor = NULL;
+	wc.hbrBackground = NULL;
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = "StylusPressurePluginWClass";
+	if (!RegisterClass(&wc)) return FALSE;
+
 	hInst = hInstance;
 
 	if (!LoadWintab()) {
@@ -256,45 +309,18 @@ BOOL InitInstance(HINSTANCE hInstance) {
 		return FALSE;
 	}
 
-	hWnd = CreateWindow("StylusPressurePluginWClass", "test", 0, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+	hWnd = CreateWindowA("StylusPressurePluginWClass", "test", 0, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+	//hWnd = CreateWindowA("StylusPressurePluginWClass", "test", WS_OVERLAPPEDWINDOW, 0, 0, 500, 500, NULL, NULL, hInstance, NULL);
+	//ShowWindow(hWnd, SW_SHOW);
 
 	if (!hWnd) {
 		SendError("Could not create window!");
 		return FALSE;
 	}
 
-	return TRUE;
-}
-
-BOOL InitApplication(HINSTANCE hInstance) {
-	WNDCLASS wc;
-	wc.style = 0;
-	wc.lpfnWndProc = MainWndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
-	wc.hIcon = NULL;
-	wc.hCursor = NULL;
-	wc.hbrBackground = NULL;
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "StylusPressurePluginWClass";
-	return RegisterClass(&wc);
-}
-
-void Cleanup() {
-	WACOM_TRACE("Cleanup()\n");
-	UnloadWintab();
-}
-
-DWORD WINAPI ThreadFunc(LPVOID lpParam) {
-	HINSTANCE hInstance = GetModuleHandle(NULL);
-
-	if (!InitApplication(hInstance)) return FALSE;
-	if (!InitInstance(hInstance)) return FALSE;
-
 	MSG msg;
 
-	while (GetMessage(&msg, NULL, 0, 0)) {
+	while (GetMessageA(&msg, hWnd, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -317,10 +343,13 @@ int main() {
 
 #ifdef DEBUG
 	while (1) {
-		::Sleep(5000);
 		PostMessage(hWnd, WM_FOCUS_TABLET, 0, 0);
+		SetFocus(hWnd);
+		::Sleep(5000);
 	}
 #endif
+
+	PostMessage(hWnd, WM_FOCUS_TABLET, 0, 0);
 
 	while (fread(&length, 4, 1, stdin)) {
 		if (length > 1023 || fread(buffer, 1, length, stdin) != length)
@@ -337,6 +366,7 @@ int main() {
 
 	PostMessage(hWnd, WM_CLOSE, 0, 0);
 	WaitForSingleObject(thread, 1000);
-	Cleanup();
+	WACOM_TRACE("Cleanup()\n");
+	UnloadWintab();
 	return 0;
 }
